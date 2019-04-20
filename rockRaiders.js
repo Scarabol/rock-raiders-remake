@@ -9,7 +9,6 @@ const drawDepthTerrainMarker = 975;
 const drawDepthSelectedSpace = 950;
 const drawDepthBuildingPlacier = 900;
 
-const drawDepthSelectedVehicle = 800;
 const drawDepthSlimes = 775;
 const drawDepthVehicle = 750;
 const drawDepthCollectables = 650;
@@ -754,8 +753,7 @@ function checkUpdateSelectionType() {
 		GameManager.refreshObject(tileSelectedGraphic);
 	}
 	if (selection[0] instanceof Vehicle) {
-		tileSelectedGraphic.drawDepth = drawDepthSelectedVehicle;
-		GameManager.refreshObject(tileSelectedGraphic);
+		// TODO show green vehicle selection wireframe
 		// manually update vehicle selection to raider riding it, if it has a driver
 		for (let i = 0; i < raiders.objectList.length; ++i) {
 			if (raiders.objectList[i].vehicle === selection[0] || raiders.objectList[i].holding.indexOf(selection[0]) !== -1) {
