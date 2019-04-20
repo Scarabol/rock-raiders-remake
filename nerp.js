@@ -257,6 +257,12 @@ NerpRunner.prototype.getRecordObjectAtTutorial = function () {
 	// TODO implement this
 };
 
+//noinspection JSUnusedGlobalSymbols
+NerpRunner.prototype.getHiddenObjectsFound = function () {
+	// TODO implement this
+	return 0;
+};
+
 NerpRunner.prototype.callMethod = function (methodName, methodArgs) {
 	if (methodName === "Stop") {
 		throw "Stop";
@@ -412,7 +418,7 @@ function preProcess(expression) {
 	} else if (labelMatch) { // label definition
 		return {label: labelMatch[1]}
 	} else if (jumpMatch) { // jump to label
-		return {jump: jumpMatch[1]};
+		return {jump: jumpMatch[1].toLowerCase()};
 	} else { // function call without args
 		if (expression.match(/[ =?><!]/)) {
 			throw "Invlid expression given, parsing must have failed before somewhere";
@@ -509,7 +515,7 @@ function NerpParser(nerpScript) {
 				args: [preProcess(nerpRunner.statements[c][0]), preProcess(nerpRunner.statements[c][1])]
 			};
 		} else if (labelMatch) { // keep label line number for later usage
-			const labelName = labelMatch[1];
+			const labelName = labelMatch[1].toLowerCase();
 			nerpRunner.labels[labelName] = c;
 			nerpRunner.statements[c] = {label: labelName};
 		} else if (nerpRunner.statements[c].length === 1) { // just a call

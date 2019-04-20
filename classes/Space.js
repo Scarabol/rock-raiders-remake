@@ -80,7 +80,7 @@ Space.prototype.updateDrillPercent = function (drillPercentIncrease, dropSpace) 
 		for (let i = 20; i <= 80; i += 20) {
 			// if we go up by a 20% mark, spawn a piece of ore or energy crystal
 			if (this.drillPercent >= i && this.drillPercent - drillPercentIncrease < i) {
-				const newOre = new Collectable(dropSpace, this.type === "ore seam" ? "ore" : "crystal");
+				const newOre = new Collectable(dropSpace, this.type === "ore seam" ? "ore" : "crystal", dropSpace.randomX(), dropSpace.randomY());
 				collectables.push(newOre);
 				tasksAvailable.push(newOre);
 			}
@@ -175,12 +175,12 @@ Space.prototype.makeRubble = function (rubbleContainsOre, drilledBy, silent = fa
 	// note that we call updateTouched before checking the adjacentSpaces
 	const adjacentSpaces = this.getAdjacentSpaces();
 
+	touchAllAdjacentSpaces(this);
 	for (let i = 0; i < adjacentSpaces.length; i++) {
 		if (adjacentSpaces[i] != null && adjacentSpaces[i].isWall === true) {
 			adjacentSpaces[i].checkWallSupported(drilledBy, silent);
 		}
 	}
-	touchAllAdjacentSpaces(this);
 };
 
 /**
@@ -235,7 +235,7 @@ Space.prototype.checkWallSupported = function (drilledBy, silent = false) {
 	adjacentSpaces.push(adjacentSpace(terrain, this.listX, this.listY, "right"));
 	for (let i = 0; i < adjacentSpaces.length; i++) {
 		if (adjacentSpaces[i] != null) {
-			adjacentSpaceIsWall[i] = adjacentSpaces[i].isWall;
+			adjacentSpaceIsWall[i] = adjacentSpaces[i].isWall || !adjacentSpaces[i].touched;
 		}
 	}
 

@@ -12,9 +12,9 @@ const drawDepthBuildingPlacier = 900;
 const drawDepthSelectedVehicle = 800;
 const drawDepthSlimes = 775;
 const drawDepthVehicle = 750;
+const drawDepthCollectables = 650;
 const drawDepthRaider = 725;
 const drawDepthMonster = 700;
-const drawDepthCollectables = 650;
 
 const drawDepthLandslide = 600;
 const drawDepthHealthBar = 500;
