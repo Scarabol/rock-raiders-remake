@@ -363,7 +363,6 @@ NerpRunner.prototype.execute = function (debug = false) {
 				this.executeStatement(statement);
 			}
 		}
-		debugger;
 	} catch (e) {
 		if (e === "Stop") {
 			return;

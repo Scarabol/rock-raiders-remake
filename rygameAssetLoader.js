@@ -418,7 +418,7 @@ function startLoadingProcess() {
 		// load in the main rygame JS file
 		new Promise((resolve) => {
 			loadScriptAsset("rygame.js", () => {
-				console.log("RyConsole: 'rygame.js' successfully loaded from directory '' as type 'js'");
+				console.log("RyConsole: 'rygame.js' successfully loaded as type 'js'");
 				resolve();
 			});
 		})
@@ -448,7 +448,7 @@ function loadLoadingScreen() { // loading screen resources
 		}),
 		new Promise((resolve) => {
 			loadScriptAsset("assets.js", () => { // a list of sequential loaded assets
-				console.log("RyConsole: 'assets.js' successfully loaded from directory '' as type 'js'");
+				console.log("RyConsole: 'assets.js' successfully loaded as type 'js'");
 				resolve();
 			});
 		})
