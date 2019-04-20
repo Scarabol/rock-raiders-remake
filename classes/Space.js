@@ -1,24 +1,30 @@
 makeChild("Space", "RygameObject");
 
+// same identifiers as in level object lists
 const BuildingTypeEnum = Object.freeze({
-	toolStore: "toolStore",
-	teleportPad: "teleportPad",
+	toolStore: "Toolstation",
+	teleportPad: "TeleportPad",
 	docks: "docks",
-	powerStation: "power station",
+	powerStation: "Powerstation",
 	supportStation: "support station",
 	upgradeStation: "upgrade station",
-	geologicalCenter: "geological center",
+	geologicalCenter: "Geo-dome",
 	oreRefinery: "ore refinery",
 	miningLaser: "mining laser",
 	superTeleport: "super teleport"
 });
 
+function getBuildingType(typename) {
+	if (!typename) return undefined;
+	return Object.values(BuildingTypeEnum).find(v => v.toLowerCase() === typename.toLowerCase());
+}
+
 // enum of space types
 spaceTypes = {
 	1: "solid rock",
 	2: "hard rock",
-	'-1': "building power path",
-	'-1.2': "power path",
+	'-1': "power path",
+	'-1.2': "building power path",
 	0: "ground",
 	30: "slug hole",
 	40: "slug hole",

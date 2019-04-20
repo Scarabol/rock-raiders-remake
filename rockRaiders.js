@@ -491,17 +491,19 @@ function loadLevelData(levelKey) {
 	// load in non-space objects next
 	const objectList = GameManager.objectLists[olFileName];
 	Object.values(objectList).forEach(function (olObject) {
+		const lTypeName = olObject.type ? olObject.type.toLowerCase() : olObject.type;
 		// all object positions seem to be off by one
 		olObject.xPos--;
 		olObject.yPos--;
-		if (olObject.type === "TVCamera") {
+		const buildingType = getBuildingType(olObject.type);
+		if (lTypeName === "TVCamera".toLowerCase()) {
 			// coords need to be rescaled since 1 unit in LRR is 1, but 1 unit in the remake is tileSize (128)
 			gameLayer.cameraX = olObject.xPos * tileSize;
 			gameLayer.cameraY = olObject.yPos * tileSize;
 			// center the camera
 			gameLayer.cameraX -= GameManager.screenWidth / 2;
 			gameLayer.cameraY -= GameManager.screenHeight / 2;
-		} else if (olObject.type === "Pilot") {
+		} else if (lTypeName === "Pilot".toLowerCase()) {
 			// note inverted x/y coords for terrain list
 			const newRaider = new Raider(terrain[parseInt(olObject.yPos, 10)][parseInt(olObject.xPos, 10)]);
 			newRaider.setCenterX(olObject.xPos * tileSize);
@@ -509,19 +511,45 @@ function loadLevelData(levelKey) {
 			// convert to radians (note that heading angle is rotated 90 degrees clockwise relative to the remake angles)
 			newRaider.drawAngle = (olObject.heading - 90) / 180 * Math.PI;
 			raiders.push(newRaider);
-		} else if (olObject.type === "Toolstation") {
-			const currentSpace = terrain[Math.floor(parseFloat(olObject.yPos))][Math.floor(parseFloat(olObject.xPos))];
-			currentSpace.setTypeProperties(BuildingTypeEnum.toolStore);
-			currentSpace.headingAngle = (olObject.heading - 90) / 180 * Math.PI;
+		} else if (buildingType) {
+			const x = Math.floor(parseFloat(olObject.yPos));
+			const y = Math.floor(parseFloat(olObject.xPos));
+			const currentSpace = terrain[x][y];
+			const angle = Math.round(olObject.heading - 90);
+			currentSpace.setTypeProperties(buildingType);
+			currentSpace.headingAngle = angle / 180 * Math.PI;
 			// check if this space was in a wall, but should now be touched
 			checkRevealSpace(currentSpace);
 			// set drawAngle to headingAngle now if this space isn't initially in the fog
 			if (currentSpace.touched) {
 				currentSpace.drawAngle = currentSpace.headingAngle - Math.PI / 2;
 			}
-			// check if this building's power path space was in a wall, but should now be touched
-			checkRevealSpace(currentSpace.powerPathSpace);
-			currentSpace.powerPathSpace.setTypeProperties("building power path");
+			if (currentSpace.powerPathSpace) { // not all buildings have a native power path
+				// check if this building's power path space was in a wall, but should now be touched
+				checkRevealSpace(currentSpace.powerPathSpace);
+				currentSpace.powerPathSpace.setTypeProperties("building power path");
+			}
+			if (buildingType === BuildingTypeEnum.powerStation) {
+				const secondSpace = terrain[x + Math.sin(angle * Math.PI / 180)][y + Math.cos(angle * Math.PI / 180)];
+				secondSpace.setTypeProperties("power station topRight");
+				secondSpace.parentSpace = currentSpace;
+				secondSpace.headingAngle = currentSpace.headingAngle;
+				secondSpace.drawAngle = currentSpace.headingAngle - Math.PI / 2;
+				currentSpace.powerPathSpace = terrain[x + Math.sin(angle * Math.PI / 180)][y - Math.sin(angle * Math.PI / 180)];
+				currentSpace.powerPathSpace.setTypeProperties("power station powerPath");
+				currentSpace.powerPathSpace.parentSpace = currentSpace;
+				currentSpace.powerPathSpace.headingAngle = currentSpace.headingAngle;
+				currentSpace.powerPathSpace.drawAngle = currentSpace.headingAngle - Math.PI / 2;
+			} else if (buildingType === BuildingTypeEnum.geologicalCenter) {
+				const secondSpace = terrain[x + Math.sin(angle * Math.PI / 180)][y + Math.cos(angle * Math.PI / 180)];
+				secondSpace.setTypeProperties("geological center right");
+				secondSpace.parentSpace = currentSpace;
+				secondSpace.headingAngle = currentSpace.headingAngle;
+				secondSpace.drawAngle = currentSpace.headingAngle - Math.PI / 2;
+			}
+		} else if (lTypeName === "PowerCrystal".toLowerCase()) {
+			const currentSpace = terrain[Math.floor(parseFloat(olObject.yPos))][Math.floor(parseFloat(olObject.xPos))];
+			collectables.push(new Collectable(currentSpace, "crystal", olObject.xPos, olObject.yPos));
 		} else {
 			// TODO implement remaining object types like: spider, drives and hovercraft
 			console.log("Object type " + olObject.type + " not yet implemented");
