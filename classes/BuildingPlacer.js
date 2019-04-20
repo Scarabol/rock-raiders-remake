@@ -17,9 +17,8 @@ BuildingPlacer.prototype.update = function () {
 			return;
 		}
 
-		this.checkUpdateKeyPress();
-
 		this.updatePosition();
+		this.updateRotation();
 
 		this.drawSurface = this.invalidSurface;
 		for (let i = 0; i < this.children.length; ++i) {
@@ -49,26 +48,12 @@ BuildingPlacer.prototype.update = function () {
 	}
 };
 
+// noinspection JSUnusedGlobalSymbols
 /**
  * override withinLayerBounds to pretend we are always in-bounds, and therefore should be rendered
  */
 BuildingPlacer.prototype.withinLayerBounds = function () {
 	return true;
-};
-
-/**
- * check if the R key has been pressed, and if so, rotate the placer
- */
-BuildingPlacer.prototype.checkUpdateKeyPress = function () {
-	// check if the R key is pressed
-	if (GameManager.keyStates[String.fromCharCode(82)]) {
-		this.holdingRKey = true;
-	} else {
-		if (this.holdingRKey) {
-			this.rotate();
-			this.holdingRKey = false;
-		}
-	}
 };
 
 /**
@@ -204,6 +189,36 @@ BuildingPlacer.prototype.updatePosition = function () {
 	this.y += tileSize * this.yOffset;
 };
 
+BuildingPlacer.prototype.updateRotation = function () {
+	const qX = GameManager.mousePos.x - this.x - tileSize / 2;
+	const absX = Math.abs(qX);
+	const qY = GameManager.mousePos.y - this.y - tileSize / 2;
+	// noinspection JSSuspiciousNameCombination
+	const absY = Math.abs(qY);
+	let dir = 0;
+	if (absX > tileSize / 10 || absY > tileSize / 10) { // small deadzone in the middle to make handling less squishy
+		if (absX < absY) {
+			if (qY < 0) { // top
+				dir = 1;
+			} else { // bottom
+				dir = 3;
+			}
+		} else {
+			if (qX < 0) { // left
+				dir = 2;
+			} else { // right
+				dir = 0;
+			}
+		}
+		if (dir !== this.dir) {
+			this.dir = dir;
+			// restart with new dir to create children in the correct position
+			this.stop();
+			this.start(this.buildingType, true);
+		}
+	}
+};
+
 /**
  * place a new building instance of the desired type
  * @param space: the space on which to place the new building
@@ -282,5 +297,4 @@ function BuildingPlacer(buildingType, isHelper, xOffset, yOffset, parentBuilder)
 	this.xOffset = xOffset;
 	this.yOffset = yOffset;
 	this.children = [];
-	this.holdingRKey = false;
 }

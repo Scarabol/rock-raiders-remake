@@ -1710,13 +1710,9 @@ function buildRequirementsMet(buildingType) {
  * @param buildingType: the type of building that the buildingPlacer should place
  */
 function startBuildingPlacer(buildingType) {
-	// TODO remove obsolete duplicate check
-	// buttons now take care of this check, but it can't hurt to check it one more time here
-	if (buildRequirementsMet(buildingType)) {
-		buildingPlacer.start(buildingType);
-		buildingPlacer.updatePosition();
-		cancelSelection();
-	}
+	buildingPlacer.start(buildingType);
+	buildingPlacer.updatePosition();
+	cancelSelection();
 }
 
 /**
